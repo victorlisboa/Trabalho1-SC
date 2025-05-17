@@ -2,12 +2,8 @@
 
 using namespace std;
 
-template<size_t N>
-
 bitset<10> ls1(bitset<10> key) {
-
     bitset<10> ls1_key;
-    int offset = 9;
 
     ls1_key[9] = key[8];
     ls1_key[8] = key[7];
@@ -24,7 +20,6 @@ bitset<10> ls1(bitset<10> key) {
 }
 
 bitset<10> ls2(bitset<10> key) {
-
     bitset<10> ls2_key;
 
     ls2_key[9] = key[7];
@@ -60,6 +55,7 @@ bitset<10> p10(bitset<10> key) {
 
 bitset<8> p8(bitset<10> key) {
     bitset<8> p8_key;
+
     p8_key[7] = key[4];
     p8_key[6] = key[7];
     p8_key[5] = key[3];
@@ -72,8 +68,7 @@ bitset<8> p8(bitset<10> key) {
     return p8_key;
 }
 
-template<size_t N>
-vector<bitset<N>> generate_keys(bitset<N> key) {
+vector<bitset<8>> generate_keys(bitset<10> key) {
     bitset<10> p10_key = p10(key);
     bitset<10> ls1_p10_key = ls1(p10_key);
     bitset<10> ls2_p10_key = ls2(ls1_p10_key);
@@ -84,15 +79,12 @@ vector<bitset<N>> generate_keys(bitset<N> key) {
 }
 
 bitset<8> sdes_encrypt(bitset<8> data, bitset<10> key) {
-    auto keys = generate_keys<10>(key);
-
-    
-    
+    auto keys = generate_keys(key);
     return data;
 }
 
+#ifndef SDES_TESTS
 int main() {
-
     bitset<10> key;
     bitset<8> data;
     // read both from input file
@@ -104,3 +96,4 @@ int main() {
 
     return 0;
 }
+#endif

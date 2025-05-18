@@ -80,8 +80,8 @@ void test_mapping_F() {
 }
 
 void test_switch_func() {
-    bitset<8> input("10101010");
-    bitset<8> expected("10101010");  // After switching halves
+    bitset<8> input("11110000");
+    bitset<8> expected("00001111");  // After switching halves
     bitset<8> result = switch_func(input);
     assert(result == expected);
     cout << "Switch function test passed!" << endl;

@@ -1,7 +1,42 @@
+/**
+ * @file sdes.cpp
+ * @brief Implementation of Simplified Data Encryption Standard (SDES)
+ * 
+ * This file implements the core SDES algorithm including:
+ * - Key generation and scheduling
+ * - Permutation functions (P10, P8, P4)
+ * - Left shifts (LS1, LS2)
+ * - S-box substitutions
+ * - Initial and inverse permutations
+ * - Encryption and decryption functions
+ */
+
 #include <bits/stdc++.h>
+#include <iomanip>
+#include <sstream>
+#include "sdes.h"
 
 using namespace std;
 
+// template<size_t N>
+// string bitset_to_hex(const bitset<N>& bs) {
+//     stringstream ss;
+//     ss << "0x";
+    
+//     // Calculate how many hex digits we need
+//     size_t hex_digits = (N + 3) / 4;  // Round up division
+    
+//     // Convert to hex, padding with leading zeros if needed
+//     ss << setfill('0') << setw(hex_digits) << uppercase << hex << bs.to_ullong();
+    
+//     return ss.str();
+// }
+
+/**
+ * @brief Performs a left shift by 1 position on a 10-bit key
+ * @param key 10-bit key to shift
+ * @return Shifted 10-bit key
+ */
 bitset<10> ls1(bitset<10> key) {
     bitset<10> ls1_key;
 
@@ -19,6 +54,11 @@ bitset<10> ls1(bitset<10> key) {
     return ls1_key;
 }
 
+/**
+ * @brief Performs a left shift by 2 positions on a 10-bit key
+ * @param key 10-bit key to shift
+ * @return Shifted 10-bit key
+ */
 bitset<10> ls2(bitset<10> key) {
     bitset<10> ls2_key;
 
@@ -36,6 +76,11 @@ bitset<10> ls2(bitset<10> key) {
     return ls2_key;
 }
 
+/**
+ * @brief Performs P10 permutation on a 10-bit key
+ * @param key 10-bit key to permute
+ * @return Permuted 10-bit key
+ */
 bitset<10> p10(bitset<10> key) {
     bitset<10> p10_key;
 
@@ -53,6 +98,11 @@ bitset<10> p10(bitset<10> key) {
     return p10_key;
 }
 
+/**
+ * @brief Performs P8 permutation on a 10-bit key to generate an 8-bit subkey
+ * @param key 10-bit key to permute
+ * @return 8-bit subkey
+ */
 bitset<8> p8(bitset<10> key) {
     bitset<8> p8_key;
 
@@ -68,6 +118,11 @@ bitset<8> p8(bitset<10> key) {
     return p8_key;
 }
 
+/**
+ * @brief Performs P4 permutation on a 4-bit value
+ * @param input 4-bit value to permute
+ * @return Permuted 4-bit value
+ */
 bitset<4> p4(bitset<4> input) {
     bitset<4> result;
 
@@ -79,6 +134,11 @@ bitset<4> p4(bitset<4> input) {
     return result;
 }
 
+/**
+ * @brief Performs initial permutation on an 8-bit block
+ * @param plaintext 8-bit block to permute
+ * @return Permuted 8-bit block
+ */
 bitset<8> ip(bitset<8> plaintext) {
     /* Initial permutation
     *  2 6 3 1 4 8 5 7
@@ -96,6 +156,11 @@ bitset<8> ip(bitset<8> plaintext) {
     return mixed_text;
 }
 
+/**
+ * @brief Performs inverse initial permutation on an 8-bit block
+ * @param ciphertext 8-bit block to permute
+ * @return Permuted 8-bit block
+ */
 bitset<8> ip_inverse(bitset<8> ciphertext) {
     /* Inverse initial permutation
     *  4 1 3 5 7 2 8 6
@@ -113,6 +178,11 @@ bitset<8> ip_inverse(bitset<8> ciphertext) {
     return plaintext;
 }
 
+/**
+ * @brief Performs expansion/permutation on a 4-bit value to 8 bits
+ * @param input 4-bit value to expand
+ * @return Expanded 8-bit value
+ */
 bitset<8> ep(bitset<4> input) {
     /* Expansion/Permutation function */
     bitset<8> output;
@@ -129,6 +199,11 @@ bitset<8> ep(bitset<4> input) {
     return output;
 }
 
+/**
+ * @brief Performs S-box 0 substitution
+ * @param input 4-bit input value
+ * @return 2-bit output value
+ */
 bitset<2> s0(bitset<4> input) {
     /* S-box 0 */
     vector<vector<int>> S0 = {
@@ -149,6 +224,11 @@ bitset<2> s0(bitset<4> input) {
     return result;
 }
 
+/**
+ * @brief Performs S-box 1 substitution
+ * @param input 4-bit input value
+ * @return 2-bit output value
+ */
 bitset<2> s1(bitset<4> input) {
     /* S-box 1 */
     vector<vector<int>> S0 = {
@@ -169,6 +249,12 @@ bitset<2> s1(bitset<4> input) {
     return result;
 }
 
+/**
+ * @brief Performs the F function mapping
+ * @param input 4-bit input value
+ * @param sk 8-bit subkey
+ * @return 4-bit output value
+ */
 bitset<4> mapping_F(bitset<4> input, bitset<8> sk) {
     bitset<8> exp_mix_data = ep(input);
     bitset<8> sk_xor = exp_mix_data ^ sk;
@@ -198,6 +284,11 @@ bitset<4> mapping_F(bitset<4> input, bitset<8> sk) {
     return p4_result;
 }
 
+/**
+ * @brief Switches the left and right halves of an 8-bit block
+ * @param bs 8-bit block to switch
+ * @return Switched 8-bit block
+ */
 bitset<8> switch_func(bitset<8> bs) {
     bitset<8> result;
     for (int i = 0; i < 4; i++) {
@@ -207,27 +298,41 @@ bitset<8> switch_func(bitset<8> bs) {
     return result;
 }
 
+/**
+ * @brief Generates two 8-bit subkeys from a 10-bit key
+ * @param key 10-bit master key
+ * @return Vector containing two 8-bit subkeys
+ */
 vector<bitset<8>> generate_keys(bitset<10> key) {
     bitset<10> p10_key = p10(key);
     bitset<10> ls1_p10_key = ls1(p10_key);
     bitset<10> ls2_p10_key = ls2(ls1_p10_key);
     bitset<8> k1 = p8(ls1_p10_key);
     bitset<8> k2 = p8(ls2_p10_key);
-    
+
     return {k1, k2};
 }
 
+/**
+ * @brief Performs the F function on an 8-bit block
+ * @param data 8-bit input block
+ * @param k 8-bit subkey
+ * @return 8-bit output block
+ */
 bitset<8> f(bitset<8> data, bitset<8> k) {
     bitset<4> L, R;
     bitset<8> output;
     for(int i=7; i>=0; i--) {
         if(i>=4) {
-            L[i] = data[i];
+            L[i-4] = data[i];
         }
         else {
             R[i] = data[i];
         }
     }
+
+    // cout << "data: " << data.to_string() << '\n';
+    
 
     bitset<4> mapping_F_result = mapping_F(R, k);
     bitset<4> new_L = L ^ mapping_F_result;
@@ -240,9 +345,19 @@ bitset<8> f(bitset<8> data, bitset<8> k) {
         result[i] = new_L[i-4];
     }
 
+    // cout << "new_L: " << new_L.to_string() << '\n';
+    // cout << "R: " << R.to_string() << '\n';
+    // cout << "result: " << result.to_string() << '\n';
+
     return result;
 }
 
+/**
+ * @brief Encrypts an 8-bit block using SDES
+ * @param plaintext 8-bit block to encrypt
+ * @param key 10-bit encryption key
+ * @return 8-bit encrypted block
+ */
 bitset<8> sdes_encrypt(bitset<8> plaintext, bitset<10> key) {
     vector<bitset<8>> keys = generate_keys(key);
     bitset<8> ip_result = ip(plaintext);
@@ -254,9 +369,16 @@ bitset<8> sdes_encrypt(bitset<8> plaintext, bitset<10> key) {
     return ciphertext;
 }
 
+/**
+ * @brief Decrypts an 8-bit block using SDES
+ * @param ciphertext 8-bit block to decrypt
+ * @param key 10-bit decryption key
+ * @return 8-bit decrypted block
+ */
 bitset<8> sdes_decrypt(bitset<8> ciphertext, bitset<10> key) {
     vector<bitset<8>> keys = generate_keys(key);
     bitset<8> ip_result = ip(ciphertext);
+    // cout << "IP: " << bitset_to_hex(ip_result) << '\n';
     bitset<8> f2_result = f(ip_result, keys[1]);
     bitset<8> switch_result = switch_func(f2_result);
     bitset<8> f1_result = f(switch_result, keys[0]);
@@ -265,21 +387,21 @@ bitset<8> sdes_decrypt(bitset<8> ciphertext, bitset<10> key) {
     return plaintext;
 }
 
-#ifndef SDES_TESTS
+/*
 int main() {
     bitset<10> key;
-    bitset<8> data;
+    bitset<8> plaintext;
     // read both from input file
-    ifstream input("input.txt");
-    input >> key >> data;
+    ifstream input("input1.txt");
+    input >> key >> plaintext;
 
-    cout << data << '\n';
-    // apply sdes encryption
-    bitset<8> encrypted = sdes_encrypt(data, key);
-    cout << encrypted << '\n';
-    bitset<8> decrypted = sdes_decrypt(data, key);
-    cout << decrypted << '\n';
+    cout << "plaintext: " << bitset_to_hex(plaintext) << '\n';
+    // // apply sdes encryption
+    bitset<8> ciphertext = sdes_encrypt(plaintext, key);
+    cout << "ciphertext: " << bitset_to_hex(ciphertext) << '\n';
+    bitset<8> decrypted = sdes_decrypt(ciphertext, key);
+    cout << "decrypted: " << bitset_to_hex(decrypted) << '\n';
 
     return 0;
 }
-#endif
+*/

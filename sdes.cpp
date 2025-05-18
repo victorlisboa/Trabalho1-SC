@@ -68,6 +68,40 @@ bitset<8> p8(bitset<10> key) {
     return p8_key;
 }
 
+bitset<8> ip(bitset<8> plaintext) {
+    /* Initial permutation
+    *  2 6 3 1 4 8 5 7
+    */
+    bitset<8> mixed_text;
+    mixed_text[7] = plaintext[6];
+    mixed_text[6] = plaintext[2];
+    mixed_text[5] = plaintext[5];
+    mixed_text[4] = plaintext[7];
+    mixed_text[3] = plaintext[4];
+    mixed_text[2] = plaintext[0];
+    mixed_text[1] = plaintext[3];
+    mixed_text[0] = plaintext[1];
+
+    return mixed_text;
+}
+
+bitset<8> ip_inverse(bitset<8> ciphertext) {
+    /* Inverse initial permutation
+    *  4 1 3 5 7 2 8 6
+    */
+    bitset<8> plaintext;
+    plaintext[6] = ciphertext[7];
+    plaintext[2] = ciphertext[6];
+    plaintext[5] = ciphertext[5];
+    plaintext[7] = ciphertext[4];
+    plaintext[4] = ciphertext[3];
+    plaintext[0] = ciphertext[2];
+    plaintext[3] = ciphertext[1];
+    plaintext[1] = ciphertext[0];
+
+    return plaintext;
+}
+
 vector<bitset<8>> generate_keys(bitset<10> key) {
     bitset<10> p10_key = p10(key);
     bitset<10> ls1_p10_key = ls1(p10_key);
@@ -78,9 +112,11 @@ vector<bitset<8>> generate_keys(bitset<10> key) {
     return {k1, k2};
 }
 
-bitset<8> sdes_encrypt(bitset<8> data, bitset<10> key) {
-    auto keys = generate_keys(key);
-    return data;
+bitset<8> sdes_encrypt(bitset<8> plaintext, bitset<10> key) {
+    vector<bitset<8>> keys = generate_keys(key);
+    bitset<8> mixed_plaintext = ip(plaintext);
+
+    return plaintext;
 }
 
 #ifndef SDES_TESTS

@@ -60,12 +60,30 @@ void test_sdes_encrypt() {
     cout << "SDES encrypt test passed!" << endl;
 }
 
+void test_ip() {
+    bitset<8> input("11010111");
+    bitset<8> expected("11011101");
+    bitset<8> result = ip(input);
+    assert(result == expected);
+    cout << "IP test passed!" << endl;
+}
+
+void test_ip_inverse() {
+    bitset<8> input("11011101");
+    bitset<8> expected("11010111");
+    bitset<8> result = ip_inverse(input);
+    assert(result == expected);
+    cout << "IP inverse test passed!" << endl;
+}
+
 void run_tests() {
     test_ls1();
     test_ls2();
     test_p10();
     test_p8();
     test_generate_keys();
+    test_ip();
+    test_ip_inverse();
     test_sdes_encrypt();
     
     cout << "All tests passed!" << endl;

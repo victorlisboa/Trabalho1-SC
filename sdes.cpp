@@ -32,6 +32,11 @@ using namespace std;
 //     return ss.str();
 // }
 
+template<size_t N>
+void print_bitsets(bitset<N> bs) {
+    cout << bitset_to_hex(bs) << '\n';
+}
+
 /**
  * @brief Performs a left shift by 1 position on a 10-bit key
  * @param key 10-bit key to shift
@@ -378,7 +383,6 @@ bitset<8> sdes_encrypt(bitset<8> plaintext, bitset<10> key) {
 bitset<8> sdes_decrypt(bitset<8> ciphertext, bitset<10> key) {
     vector<bitset<8>> keys = generate_keys(key);
     bitset<8> ip_result = ip(ciphertext);
-    // cout << "IP: " << bitset_to_hex(ip_result) << '\n';
     bitset<8> f2_result = f(ip_result, keys[1]);
     bitset<8> switch_result = switch_func(f2_result);
     bitset<8> f1_result = f(switch_result, keys[0]);

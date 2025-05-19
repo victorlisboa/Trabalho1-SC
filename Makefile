@@ -5,12 +5,12 @@ CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17
 
 # Target executable name
-TARGET = my_program
+TARGET = sdes
 
 # Source files
 SRCS = op_modes.cpp sdes.cpp
 
-# Object files (replace .cpp with .o)
+# Object files
 OBJS = $(SRCS:.cpp=.o)
 
 # Default target
@@ -24,6 +24,12 @@ $(TARGET): $(OBJS)
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+# Run the program
+run: $(TARGET)
+	./$(TARGET)
+
 # Clean up
 clean:
 	rm -f $(OBJS) $(TARGET)
+
+.PHONY: all run clean

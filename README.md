@@ -11,6 +11,7 @@ This project implements the Simplified Data Encryption Standard (SDES) with two 
   - 10-bit key
   - 32-bit message
   - 8-bit initialization vector (IV)
+- `Makefile`: Build configuration for the project
 
 ## Features
 
@@ -32,19 +33,33 @@ This project implements the Simplified Data Encryption Standard (SDES) with two 
    - First block is XORed with IV
    - Provides better security than ECB by preventing pattern recognition
 
-## Usage
+## Building and Running
 
-1. Compile the project:
+The project uses a Makefile for building and running. Here are the available commands:
+
+1. Build the program:
 ```bash
-g++ op_modes.cpp sdes.cpp -o op_modes
+make
 ```
 
 2. Run the program:
 ```bash
-./op_modes
+make run
 ```
 
-3. Input Format (input2.txt):
+3. Clean build files:
+```bash
+make clean
+```
+
+4. Build and run in one command:
+```bash
+make run
+```
+
+## Input Format
+
+The program expects an input file named `input2.txt` with the following format:
 ```
 1010000010           # 10-bit key
 11010111011011001011101011110000  # 32-bit message
@@ -61,6 +76,13 @@ The program will display:
 3. CBC Mode:
    - Encrypted blocks
    - Decrypted blocks
+
+Each operation will show detailed intermediate steps of the SDES algorithm, including:
+- Key generation process
+- Permutation operations
+- S-box substitutions
+- F-function operations
+- Final encryption/decryption results
 
 ## Security Considerations
 

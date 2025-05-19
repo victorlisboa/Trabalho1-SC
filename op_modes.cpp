@@ -89,7 +89,7 @@ vector<bitset<8>> cbc_decrypt(const vector<bitset<8>>& ciphertext, const bitset<
  */
 void print_blocks(const vector<bitset<8>>& blocks) {
     for (const auto& block : blocks) {
-        cout << block << " ";
+        cout << bitset_to_hex(block) << " ";
     }
     cout << endl;
 }

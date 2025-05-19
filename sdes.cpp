@@ -56,6 +56,9 @@ bitset<10> ls1(bitset<10> key) {
     ls1_key[1] = key[0];
     ls1_key[0] = key[4];
 
+    cout << "LS1 output: ";
+    print_bitsets(ls1_key);
+
     return ls1_key;
 }
 
@@ -77,6 +80,9 @@ bitset<10> ls2(bitset<10> key) {
     ls2_key[2] = key[0];
     ls2_key[1] = key[4];
     ls2_key[0] = key[3];
+
+    cout << "LS2 output: ";
+    print_bitsets(ls2_key);
 
     return ls2_key;
 }
@@ -100,6 +106,9 @@ bitset<10> p10(bitset<10> key) {
     p10_key[1] = key[2];
     p10_key[0] = key[4];
 
+    cout << "P10 output: ";
+    print_bitsets(p10_key);
+
     return p10_key;
 }
 
@@ -120,6 +129,9 @@ bitset<8> p8(bitset<10> key) {
     p8_key[1] = key[0];
     p8_key[0] = key[1];
 
+    cout << "P8 output: ";
+    print_bitsets(p8_key);
+
     return p8_key;
 }
 
@@ -135,6 +147,9 @@ bitset<4> p4(bitset<4> input) {
     result[2] = input[0];
     result[1] = input[1];
     result[0] = input[3];
+
+    cout << "P4 output: ";
+    print_bitsets(result);
 
     return result;
 }
@@ -158,6 +173,9 @@ bitset<8> ip(bitset<8> plaintext) {
     mixed_text[1] = plaintext[3];
     mixed_text[0] = plaintext[1];
 
+    cout << "IP output: ";
+    print_bitsets(mixed_text);
+
     return mixed_text;
 }
 
@@ -180,6 +198,9 @@ bitset<8> ip_inverse(bitset<8> ciphertext) {
     plaintext[3] = ciphertext[1];
     plaintext[1] = ciphertext[0];
 
+    cout << "IP^-1 output: ";
+    print_bitsets(plaintext);
+
     return plaintext;
 }
 
@@ -200,6 +221,9 @@ bitset<8> ep(bitset<4> input) {
     output[2] = input[1];
     output[1] = input[0];
     output[0] = input[3];
+
+    cout << "EP output: ";
+    print_bitsets(output);
 
     return output;
 }
@@ -226,6 +250,9 @@ bitset<2> s0(bitset<4> input) {
     result[0] = value & 1;
     result[1] = (value >> 1) & 1;
     
+    cout << "S0 output: ";
+    print_bitsets(result);
+    
     return result;
 }
 
@@ -251,6 +278,9 @@ bitset<2> s1(bitset<4> input) {
     result[0] = value & 1;
     result[1] = (value >> 1) & 1;
     
+    cout << "S1 output: ";
+    print_bitsets(result);
+    
     return result;
 }
 
@@ -263,6 +293,11 @@ bitset<2> s1(bitset<4> input) {
 bitset<4> mapping_F(bitset<4> input, bitset<8> sk) {
     bitset<8> exp_mix_data = ep(input);
     bitset<8> sk_xor = exp_mix_data ^ sk;
+
+    cout << "F function - After EP: ";
+    print_bitsets(exp_mix_data);
+    cout << "F function - After XOR with subkey: ";
+    print_bitsets(sk_xor);
 
     bitset<4> s0_input;
     s0_input[3] = sk_xor[7];
@@ -286,6 +321,9 @@ bitset<4> mapping_F(bitset<4> input, bitset<8> sk) {
     
     bitset<4> p4_result = p4(p4_input);
 
+    cout << "F function final output: ";
+    print_bitsets(p4_result);
+
     return p4_result;
 }
 
@@ -300,6 +338,10 @@ bitset<8> switch_func(bitset<8> bs) {
         result[i] = bs[i + 4];
         result[i + 4] = bs[i];
     }
+    
+    cout << "Switch function output: ";
+    print_bitsets(result);
+
     return result;
 }
 
@@ -309,11 +351,20 @@ bitset<8> switch_func(bitset<8> bs) {
  * @return Vector containing two 8-bit subkeys
  */
 vector<bitset<8>> generate_keys(bitset<10> key) {
+    cout << "\nKey Generation Process:\n";
+    cout << "Original key: ";
+    print_bitsets(key);
+
     bitset<10> p10_key = p10(key);
     bitset<10> ls1_p10_key = ls1(p10_key);
-    bitset<10> ls2_p10_key = ls2(ls1_p10_key);
     bitset<8> k1 = p8(ls1_p10_key);
+    cout << "K1: ";
+    print_bitsets(k1);
+
+    bitset<10> ls2_p10_key = ls2(ls1_p10_key);
     bitset<8> k2 = p8(ls2_p10_key);
+    cout << "K2: ";
+    print_bitsets(k2);
 
     return {k1, k2};
 }
@@ -336,8 +387,15 @@ bitset<8> f(bitset<8> data, bitset<8> k) {
         }
     }
 
-    // cout << "data: " << data.to_string() << '\n';
-    
+    cout << "\nF function process:\n";
+    cout << "Input data: ";
+    print_bitsets(data);
+    cout << "Left half: ";
+    print_bitsets(L);
+    cout << "Right half: ";
+    print_bitsets(R);
+    cout << "Subkey: ";
+    print_bitsets(k);
 
     bitset<4> mapping_F_result = mapping_F(R, k);
     bitset<4> new_L = L ^ mapping_F_result;
@@ -350,9 +408,8 @@ bitset<8> f(bitset<8> data, bitset<8> k) {
         result[i] = new_L[i-4];
     }
 
-    // cout << "new_L: " << new_L.to_string() << '\n';
-    // cout << "R: " << R.to_string() << '\n';
-    // cout << "result: " << result.to_string() << '\n';
+    cout << "F function result: ";
+    print_bitsets(result);
 
     return result;
 }
@@ -364,12 +421,21 @@ bitset<8> f(bitset<8> data, bitset<8> k) {
  * @return 8-bit encrypted block
  */
 bitset<8> sdes_encrypt(bitset<8> plaintext, bitset<10> key) {
+    cout << "\nSDES Encryption Process:\n";
+    cout << "Plaintext: ";
+    print_bitsets(plaintext);
+    cout << "Key: ";
+    print_bitsets(key);
+
     vector<bitset<8>> keys = generate_keys(key);
     bitset<8> ip_result = ip(plaintext);
     bitset<8> f1_result = f(ip_result, keys[0]);
     bitset<8> switch_result = switch_func(f1_result);
     bitset<8> f2_result = f(switch_result, keys[1]);
     bitset<8> ciphertext = ip_inverse(f2_result);
+
+    cout << "Final ciphertext: ";
+    print_bitsets(ciphertext);
 
     return ciphertext;
 }
@@ -381,12 +447,21 @@ bitset<8> sdes_encrypt(bitset<8> plaintext, bitset<10> key) {
  * @return 8-bit decrypted block
  */
 bitset<8> sdes_decrypt(bitset<8> ciphertext, bitset<10> key) {
+    cout << "\nSDES Decryption Process:\n";
+    cout << "Ciphertext: ";
+    print_bitsets(ciphertext);
+    cout << "Key: ";
+    print_bitsets(key);
+
     vector<bitset<8>> keys = generate_keys(key);
     bitset<8> ip_result = ip(ciphertext);
     bitset<8> f2_result = f(ip_result, keys[1]);
     bitset<8> switch_result = switch_func(f2_result);
     bitset<8> f1_result = f(switch_result, keys[0]);
     bitset<8> plaintext = ip_inverse(f1_result);
+
+    cout << "Final plaintext: ";
+    print_bitsets(plaintext);
 
     return plaintext;
 }
